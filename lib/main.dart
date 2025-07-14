@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/screens/home/home_screen.dart';
-import 'package:task_management_app/themes/app_theme.dart';
-import 'package:task_management_app/screens/test_screen.dart';
+import 'package:task_management_app/features/tasks/presentation/screens/home/home_screen.dart';
+import 'package:task_management_app/core/themes/app_theme.dart';
+import 'package:task_management_app/features/tasks/presentation/screens/test_screen.dart';
 
 Future <void> main() async {
   runApp(const TaskManagementApp());
