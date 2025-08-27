@@ -13,6 +13,8 @@ import 'features/tasks/presentation/cubit/tasks_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'utils/notifications/notification_service.dart';
 import 'utils/notifications/firebase_messaging_handler.dart';
+import 'features/settings/presentation/cubit/app_settings_cubit.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +48,7 @@ Future<void> main() async {
               deleteTaskUseCase: del,
             ),
           ),
+          BlocProvider(create: (_) => AppSettingsCubit()),
         ],
         child: const TaskManagementApp(),
       ),
@@ -58,12 +61,24 @@ class TaskManagementApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Task Management App',
-      themeMode: ThemeMode.system,
-      theme: AppTheme.light(),
-      home: const TasksPage(),
+    return BlocBuilder<AppSettingsCubit, AppSettingsState>(
+      builder: (context, settings) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Task Management App',
+          themeMode: settings.themeMode,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          locale: settings.locale,
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: const TasksPage(),
+        );
+      },
     );
   }
 }

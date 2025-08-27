@@ -29,6 +29,24 @@ class AppTheme {
       appBarTheme: buildAppBarTheme(),
     );
   }
+
+  static ThemeData dark() {
+    final ColorScheme colorScheme = const ColorScheme.dark().copyWith(
+      primary: AppColors.purple400,
+      secondary: AppColors.purple300,
+      surface: AppColors.neutral100,
+    );
+    return ThemeData(
+      colorScheme: colorScheme,
+      useMaterial3: true,
+      scaffoldBackgroundColor: const Color(0xFF111318),
+      textTheme: buildTextTheme().apply(bodyColor: Colors.white, displayColor: Colors.white),
+      elevatedButtonTheme: buildElevatedButtonTheme(),
+      textButtonTheme: buildTextButtonTheme(),
+      outlinedButtonTheme: buildOutlinedButtonTheme(),
+      appBarTheme: buildAppBarTheme(),
+    );
+  }
 }
 
 /// app_theme.dart

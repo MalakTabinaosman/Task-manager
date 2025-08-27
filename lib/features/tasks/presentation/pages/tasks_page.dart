@@ -7,6 +7,8 @@ import '../../domain/entities/task.dart';
 import '../cubit/tasks_cubit.dart';
 import '../../../../utils/constants/strings.dart';
 import '../widgets/week_calendar.dart';
+import '../../../profile/presentation/pages/profile_page.dart';
+import '../../../settings/presentation/pages/settings_page.dart';
 
 class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
@@ -17,6 +19,7 @@ class TasksPage extends StatelessWidget {
       create: (context) => context.read<TasksCubit>()..load(),
       child: Scaffold(
         appBar: AppBar(title: const Text(AppStrings.tasksTitle)),
+        drawer: _AppDrawer(),
         body: BlocBuilder<TasksCubit, TasksState>(
           builder: (context, state) {
             final tasksForDay = context.read<TasksCubit>().tasksForDate(state.selectedDate);
@@ -177,5 +180,36 @@ Future<Task?> _showAddEditDialog(BuildContext context, {Task? initial}) async {
       );
     },
   );
+}
+
+class _AppDrawer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        children: [
+          const DrawerHeader(
+            child: Text('Task Management App'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ProfilePage()));
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+            },
+          ),
+        ],
+      ),
+    );
+  }
 }
 

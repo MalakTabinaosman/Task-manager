@@ -20,8 +20,8 @@ class TasksState {
     this.isLoading = false,
     DateTime? weekStart,
     DateTime? selectedDate,
-  })  : weekStart = weekStart ?? _mondayOf(DateTime.now()),
-        selectedDate = selectedDate ?? DateTime.now();
+  }) : weekStart = weekStart ?? _mondayOf(DateTime.now()),
+       selectedDate = selectedDate ?? DateTime.now();
   static DateTime _mondayOf(DateTime date) {
     final d = DateTime(date.year, date.month, date.day);
     final int weekday = d.weekday; // 1 (Mon) .. 7 (Sun)
@@ -34,11 +34,11 @@ class TasksState {
     DateTime? weekStart,
     DateTime? selectedDate,
   }) => TasksState(
-        tasks: tasks ?? this.tasks,
-        isLoading: isLoading ?? this.isLoading,
-        weekStart: weekStart ?? this.weekStart,
-        selectedDate: selectedDate ?? this.selectedDate,
-      );
+    tasks: tasks ?? this.tasks,
+    isLoading: isLoading ?? this.isLoading,
+    weekStart: weekStart ?? this.weekStart,
+    selectedDate: selectedDate ?? this.selectedDate,
+  );
 }
 
 class TasksCubit extends Cubit<TasksState> {
@@ -96,7 +96,9 @@ class TasksCubit extends Cubit<TasksState> {
 
   /// Sets the currently selected date within the visible week.
   void setSelectedDate(DateTime date) {
-    emit(state.copyWith(selectedDate: DateTime(date.year, date.month, date.day)));
+    emit(
+      state.copyWith(selectedDate: DateTime(date.year, date.month, date.day)),
+    );
   }
 
   /// Moves the visible week by [deltaWeeks] (negative for previous, positive for next).
@@ -108,11 +110,13 @@ class TasksCubit extends Cubit<TasksState> {
   /// Returns tasks scheduled for [date] (by reminderAt date). Tasks without reminder are excluded.
   List<Task> tasksForDate(DateTime date) {
     final d = DateTime(date.year, date.month, date.day);
-    return state.tasks.where((t) {
-      if (t.reminderAt == null) return false;
-      final r = t.reminderAt!;
-      return r.year == d.year && r.month == d.month && r.day == d.day;
-    }).toList(growable: false);
+    return state.tasks
+        .where((t) {
+          if (t.reminderAt == null) return false;
+          final r = t.reminderAt!;
+          return r.year == d.year && r.month == d.month && r.day == d.day;
+        })
+        .toList(growable: false);
   }
 
   Future<void> _scheduleFor(Task task) async {
@@ -144,4 +148,3 @@ class TasksCubit extends Cubit<TasksState> {
     await NotificationService.instance.cancel(id);
   }
 }
-
