@@ -12,7 +12,7 @@ import '../../../../utils/notifications/notification_service.dart';
 class TasksState {
   final List<Task> tasks;
   final bool isLoading;
-  final DateTime weekStart; // Monday of current week view
+  final DateTime weekStart; // Sunday of current week view
   final DateTime selectedDate; // Selected day within week
 
   const TasksState({
@@ -20,12 +20,13 @@ class TasksState {
     this.isLoading = false,
     DateTime? weekStart,
     DateTime? selectedDate,
-  }) : weekStart = weekStart ?? _mondayOf(DateTime.now()),
+  }) : weekStart = weekStart ?? _sundayOf(DateTime.now()),
        selectedDate = selectedDate ?? DateTime.now();
-  static DateTime _mondayOf(DateTime date) {
+  static DateTime _sundayOf(DateTime date) {
     final d = DateTime(date.year, date.month, date.day);
-    final int weekday = d.weekday; // 1 (Mon) .. 7 (Sun)
-    return d.subtract(Duration(days: weekday - 1));
+    // DateTime.weekday: 1 (Mon) .. 7 (Sun). We want Sunday as start (offset 0).
+    final int offset = d.weekday % 7; // Sunday -> 0, Monday -> 1, ... Saturday -> 6
+    return d.subtract(Duration(days: offset));
   }
 
   TasksState copyWith({

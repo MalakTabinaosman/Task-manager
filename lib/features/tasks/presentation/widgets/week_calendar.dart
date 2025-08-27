@@ -37,6 +37,7 @@ class _WeekCalendarState extends State<WeekCalendar> {
               _controller.jumpToPage(_initialPage); // reset to center for repeated deltas
             },
             itemBuilder: (context, _) {
+              // Ensure week starts on Sunday consistently
               final days = List.generate(7, (i) => state.weekStart.add(Duration(days: i)));
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -88,6 +89,8 @@ class _DayChip extends StatelessWidget {
 
   String _weekdayLabel(int weekday) {
     switch (weekday) {
+      case DateTime.sunday:
+        return 'Sun';
       case DateTime.monday:
         return 'Mon';
       case DateTime.tuesday:
@@ -100,8 +103,6 @@ class _DayChip extends StatelessWidget {
         return 'Fri';
       case DateTime.saturday:
         return 'Sat';
-      case DateTime.sunday:
-        return 'Sun';
       default:
         return '';
     }
