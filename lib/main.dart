@@ -11,6 +11,8 @@ import 'features/tasks/domain/usecases/edit_task.dart';
 import 'features/tasks/domain/usecases/delete_task.dart';
 import 'features/tasks/presentation/cubit/tasks_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'utils/notifications/notification_service.dart';
+import 'utils/notifications/firebase_messaging_handler.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +28,10 @@ Future<void> main() async {
   final add = AddTask(repository);
   final edit = EditTask(repository);
   final del = DeleteTask(repository);
+
+  // Initialize notifications and Firebase messaging
+  await NotificationService.instance.initialize();
+  await FirebaseMessagingHandler.instance.initialize();
 
   runApp(
     RepositoryProvider.value(

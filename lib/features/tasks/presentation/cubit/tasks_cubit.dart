@@ -7,6 +7,7 @@ import '../../domain/usecases/add_task.dart';
 import '../../domain/usecases/delete_task.dart';
 import '../../domain/usecases/edit_task.dart';
 import '../../domain/usecases/get_all_tasks.dart';
+import '../../../../utils/notifications/notification_service.dart';
 
 class TasksState {
   final List<Task> tasks;
@@ -21,7 +22,6 @@ class TasksState {
     DateTime? selectedDate,
   })  : weekStart = weekStart ?? _mondayOf(DateTime.now()),
         selectedDate = selectedDate ?? DateTime.now();
-
   static DateTime _mondayOf(DateTime date) {
     final d = DateTime(date.year, date.month, date.day);
     final int weekday = d.weekday; // 1 (Mon) .. 7 (Sun)
@@ -64,6 +64,9 @@ class TasksCubit extends Cubit<TasksState> {
   /// Adds a new [task] and refreshes the list.
   Future<void> add(Task task) async {
     await addTaskUseCase(task);
+    if (task.reminderAt != null) {
+      await _scheduleFor(task);
+    }
     await load();
   }
 
@@ -77,12 +80,17 @@ class TasksCubit extends Cubit<TasksState> {
   /// Edits an existing task.
   Future<void> edit(Task task) async {
     await editTaskUseCase(task);
+    await _cancelFor(task.id);
+    if (task.reminderAt != null) {
+      await _scheduleFor(task);
+    }
     await load();
   }
 
   /// Removes a task by [id].
   Future<void> remove(String id) async {
     await deleteTaskUseCase(id);
+    await _cancelFor(id);
     await load();
   }
 
@@ -105,6 +113,35 @@ class TasksCubit extends Cubit<TasksState> {
       final r = t.reminderAt!;
       return r.year == d.year && r.month == d.month && r.day == d.day;
     }).toList(growable: false);
+  }
+
+  Future<void> _scheduleFor(Task task) async {
+    int? repeatDays;
+    switch (task.repeat) {
+      case RepeatInterval.none:
+        repeatDays = null;
+        break;
+      case RepeatInterval.daily:
+        repeatDays = 1;
+        break;
+      case RepeatInterval.weekly:
+        repeatDays = 7;
+        break;
+      case RepeatInterval.monthly:
+        repeatDays = 30;
+        break;
+    }
+    await NotificationService.instance.schedule(
+      task.id,
+      'Task Reminder',
+      task.title,
+      task.reminderAt!,
+      repeatDays: repeatDays,
+    );
+  }
+
+  Future<void> _cancelFor(String id) async {
+    await NotificationService.instance.cancel(id);
   }
 }
 
