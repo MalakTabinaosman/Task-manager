@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:task_management_app/features/tasks/presentation/screens/home/home_screen.dart';
-import 'package:task_management_app/core/themes/app_theme.dart';
-import 'package:task_management_app/features/tasks/presentation/screens/task_list_screen.dart';
+import 'theme/app_theme.dart';
+import 'features/tasks/presentation/pages/tasks_page.dart';
 
-Future <void> main() async {
+Future<void> main() async {
   runApp(const TaskManagementApp());
 }
 
 class TaskManagementApp extends StatelessWidget {
-  const TaskManagementApp({Key? key}) : super(key: key);
+  const TaskManagementApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,9 +15,8 @@ class TaskManagementApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Task Management App',
       themeMode: ThemeMode.system,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      home: const HomeScreen(),
+      theme: AppTheme.light(),
+      home: const TasksPage(),
     );
   }
 }
