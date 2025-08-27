@@ -39,4 +39,3 @@ class AppStrings {
   static const String noTasks = 'No tasks yet';
   static const String addTask = 'Add Task';
 }
-

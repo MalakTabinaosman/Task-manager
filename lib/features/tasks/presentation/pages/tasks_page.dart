@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/task.dart';
 import '../cubit/tasks_cubit.dart';
 import '../../../../utils/constants/strings.dart';
+import '../widgets/week_calendar.dart';
 
 class TasksPage extends StatelessWidget {
   const TasksPage({super.key});
@@ -18,32 +19,44 @@ class TasksPage extends StatelessWidget {
         appBar: AppBar(title: const Text(AppStrings.tasksTitle)),
         body: BlocBuilder<TasksCubit, TasksState>(
           builder: (context, state) {
-            if (state.tasks.isEmpty) {
-              return const Center(child: Text(AppStrings.noTasks));
-            }
-            return ListView.separated(
-              itemCount: state.tasks.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final task = state.tasks[index];
-                return ListTile(
-                  title: Text(
-                    task.title,
-                    style: TextStyle(
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
-                    ),
+            final tasksForDay = context.read<TasksCubit>().tasksForDate(state.selectedDate);
+            return Column(
+              children: [
+                const WeekCalendar(),
+                const Divider(height: 1),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: tasksForDay.isEmpty
+                        ? const Center(key: ValueKey('empty'), child: Text(AppStrings.noTasks))
+                        : ListView.separated(
+                            key: const ValueKey('list'),
+                            itemCount: tasksForDay.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1),
+                            itemBuilder: (context, index) {
+                              final task = tasksForDay[index];
+                              return ListTile(
+                                title: Text(
+                                  task.title,
+                                  style: TextStyle(
+                                    decoration: task.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
+                                  ),
+                                ),
+                                trailing: Checkbox(
+                                  value: task.isCompleted,
+                                  onChanged: (_) => context.read<TasksCubit>().toggle(task.id),
+                                ),
+                                onTap: () async {
+                                  final edited = await _showAddEditDialog(context, initial: task);
+                                  if (edited != null) context.read<TasksCubit>().edit(edited);
+                                },
+                                onLongPress: () => context.read<TasksCubit>().remove(task.id),
+                              );
+                            },
+                          ),
                   ),
-                  trailing: Checkbox(
-                    value: task.isCompleted,
-                    onChanged: (_) => context.read<TasksCubit>().toggle(task.id),
-                  ),
-                  onTap: () async {
-                    final edited = await _showAddEditDialog(context, initial: task);
-                    if (edited != null) context.read<TasksCubit>().edit(edited);
-                  },
-                  onLongPress: () => context.read<TasksCubit>().remove(task.id),
-                );
-              },
+                ),
+              ],
             );
           },
         ),

@@ -11,10 +11,34 @@ import '../../domain/usecases/get_all_tasks.dart';
 class TasksState {
   final List<Task> tasks;
   final bool isLoading;
-  const TasksState({this.tasks = const [], this.isLoading = false});
+  final DateTime weekStart; // Monday of current week view
+  final DateTime selectedDate; // Selected day within week
 
-  TasksState copyWith({List<Task>? tasks, bool? isLoading}) =>
-      TasksState(tasks: tasks ?? this.tasks, isLoading: isLoading ?? this.isLoading);
+  const TasksState({
+    this.tasks = const [],
+    this.isLoading = false,
+    DateTime? weekStart,
+    DateTime? selectedDate,
+  })  : weekStart = weekStart ?? _mondayOf(DateTime.now()),
+        selectedDate = selectedDate ?? DateTime.now();
+
+  static DateTime _mondayOf(DateTime date) {
+    final d = DateTime(date.year, date.month, date.day);
+    final int weekday = d.weekday; // 1 (Mon) .. 7 (Sun)
+    return d.subtract(Duration(days: weekday - 1));
+  }
+
+  TasksState copyWith({
+    List<Task>? tasks,
+    bool? isLoading,
+    DateTime? weekStart,
+    DateTime? selectedDate,
+  }) => TasksState(
+        tasks: tasks ?? this.tasks,
+        isLoading: isLoading ?? this.isLoading,
+        weekStart: weekStart ?? this.weekStart,
+        selectedDate: selectedDate ?? this.selectedDate,
+      );
 }
 
 class TasksCubit extends Cubit<TasksState> {
@@ -60,6 +84,27 @@ class TasksCubit extends Cubit<TasksState> {
   Future<void> remove(String id) async {
     await deleteTaskUseCase(id);
     await load();
+  }
+
+  /// Sets the currently selected date within the visible week.
+  void setSelectedDate(DateTime date) {
+    emit(state.copyWith(selectedDate: DateTime(date.year, date.month, date.day)));
+  }
+
+  /// Moves the visible week by [deltaWeeks] (negative for previous, positive for next).
+  void shiftWeek(int deltaWeeks) {
+    final newStart = state.weekStart.add(Duration(days: 7 * deltaWeeks));
+    emit(state.copyWith(weekStart: newStart, selectedDate: newStart));
+  }
+
+  /// Returns tasks scheduled for [date] (by reminderAt date). Tasks without reminder are excluded.
+  List<Task> tasksForDate(DateTime date) {
+    final d = DateTime(date.year, date.month, date.day);
+    return state.tasks.where((t) {
+      if (t.reminderAt == null) return false;
+      final r = t.reminderAt!;
+      return r.year == d.year && r.month == d.month && r.day == d.day;
+    }).toList(growable: false);
   }
 }
 
