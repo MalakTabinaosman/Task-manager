@@ -25,7 +25,8 @@ class TasksState {
   static DateTime _sundayOf(DateTime date) {
     final d = DateTime(date.year, date.month, date.day);
     // DateTime.weekday: 1 (Mon) .. 7 (Sun). We want Sunday as start (offset 0).
-    final int offset = d.weekday % 7; // Sunday -> 0, Monday -> 1, ... Saturday -> 6
+    final int offset =
+        d.weekday % 7; // Sunday -> 0, Monday -> 1, ... Saturday -> 6
     return d.subtract(Duration(days: offset));
   }
 

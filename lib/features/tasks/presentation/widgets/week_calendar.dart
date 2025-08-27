@@ -34,16 +34,28 @@ class _WeekCalendarState extends State<WeekCalendar> {
             onPageChanged: (page) {
               final delta = page - _initialPage;
               context.read<TasksCubit>().shiftWeek(delta);
-              _controller.jumpToPage(_initialPage); // reset to center for repeated deltas
+              _controller.jumpToPage(
+                _initialPage,
+              ); // reset to center for repeated deltas
             },
             itemBuilder: (context, _) {
               // Ensure week starts on Sunday consistently
-              final days = List.generate(7, (i) => state.weekStart.add(Duration(days: i)));
+              final days = List.generate(
+                7,
+                (i) => state.weekStart.add(Duration(days: i)),
+              );
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: days.map((d) {
-                  final isSelected = d.year == state.selectedDate.year && d.month == state.selectedDate.month && d.day == state.selectedDate.day;
-                  return _DayChip(date: d, selected: isSelected, onTap: () => context.read<TasksCubit>().setSelectedDate(d));
+                  final isSelected =
+                      d.year == state.selectedDate.year &&
+                      d.month == state.selectedDate.month &&
+                      d.day == state.selectedDate.day;
+                  return _DayChip(
+                    date: d,
+                    selected: isSelected,
+                    onTap: () => context.read<TasksCubit>().setSelectedDate(d),
+                  );
                 }).toList(),
               );
             },
@@ -58,7 +70,11 @@ class _DayChip extends StatelessWidget {
   final DateTime date;
   final bool selected;
   final VoidCallback onTap;
-  const _DayChip({required this.date, required this.selected, required this.onTap});
+  const _DayChip({
+    required this.date,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +87,18 @@ class _DayChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? Theme.of(context).colorScheme.primary.withOpacity(0.15) : Colors.transparent,
+            color: selected
+                ? Theme.of(context).colorScheme.primary.withOpacity(0.15)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(_weekdayLabel(date.weekday), style: Theme.of(context).textTheme.labelLarge),
+              Text(
+                _weekdayLabel(date.weekday),
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
               const SizedBox(height: 4),
               Text(label, style: Theme.of(context).textTheme.bodyMedium),
             ],
@@ -108,4 +129,3 @@ class _DayChip extends StatelessWidget {
     }
   }
 }
-
